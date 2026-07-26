@@ -316,7 +316,6 @@
             color: var(--text-muted);
         }
 
-        /* File input - visually hidden but still interactable for iOS Safari */
         .file-input-hidden {
             position: absolute;
             width: 1px;
@@ -348,11 +347,15 @@
         }
 
         .preview-image {
-            max-width: 100%;
-            max-height: 280px;
-            object-fit: contain;
             display: block;
             transition: opacity var(--transition);
+        }
+
+        canvas.preview-image {
+            max-width: 100%;
+            max-height: 280px;
+            width: auto;
+            height: auto;
         }
 
         .preview-placeholder {
@@ -640,7 +643,7 @@
             box-shadow: 0 0 20px var(--blue-glow);
         }
 
-        /* Quality Slider */
+        /* Quality & Radius Slider */
         .quality-section {
             margin-top: 12px;
             animation: fadeSlideUp 0.3s var(--transition) both;
@@ -931,7 +934,7 @@
                 min-height: 140px;
                 max-height: 360px;
             }
-            .preview-image {
+            canvas.preview-image {
                 max-height: 340px;
             }
         }
@@ -965,7 +968,7 @@
             .preview-container {
                 max-height: 200px;
             }
-            .preview-image {
+            canvas.preview-image {
                 max-height: 180px;
             }
         }
@@ -1005,7 +1008,7 @@
                     <span class="material-symbols-outlined">photo</span>
                     <span>No image uploaded</span>
                 </div>
-                <img id="previewImage" class="preview-image hidden" src="" alt="Preview">
+                <canvas id="previewCanvas" class="preview-image hidden" aria-label="Image preview"></canvas>
                 <div class="preview-badge hidden" id="previewBadge">
                     <span class="dot"></span>
                     <span id="previewBadgeText">Uploaded</span>
@@ -1070,6 +1073,31 @@
             </div>
         </div>
 
+        <!-- Corner Rounding Card -->
+        <div class="card" id="roundingCard">
+            <div class="card-header">
+                <span class="material-symbols-outlined">rounded_corner</span>
+                <span class="card-label">Corner Rounding</span>
+            </div>
+            <div class="toggle-row">
+                <div class="toggle-label-group">
+                    <span class="material-symbols-outlined" id="roundingIcon">rounded_corner</span>
+                    <span>Round corners</span>
+                </div>
+                <label class="toggle-switch" aria-label="Toggle corner rounding">
+                    <input type="checkbox" id="roundingToggle">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <div class="quality-section hidden" id="roundingSection">
+                <div class="quality-header">
+                    <span class="card-label-small">Radius</span>
+                    <span class="quality-value" id="radiusValue">0 px</span>
+                </div>
+                <input type="range" class="range-slider" id="radiusSlider" min="0" max="100" value="0" step="1" aria-label="Corner radius slider">
+            </div>
+        </div>
+
         <!-- Action Button -->
         <button class="btn btn-primary" id="resizeBtn" disabled aria-label="Resize and download image">
             <span class="material-symbols-outlined">download</span>
@@ -1121,12 +1149,15 @@
             let isProcessing = false;
             let lastProcessedFileName = null;
             let lastProcessedFileTime = null;
+            // Corner rounding state
+            let roundCorners = false;
+            let cornerRadius = 0;
 
             // ==================== DOM REFERENCES ====================
             const logoImage = document.getElementById('logoImage');
             const fileInput = document.getElementById('fileInput');
             const uploadZone = document.getElementById('uploadZone');
-            const previewImage = document.getElementById('previewImage');
+            const previewCanvas = document.getElementById('previewCanvas');
             const previewPlaceholder = document.getElementById('previewPlaceholder');
             const previewBadge = document.getElementById('previewBadge');
             const previewBadgeText = document.getElementById('previewBadgeText');
@@ -1150,43 +1181,40 @@
             const resultFormat = document.getElementById('resultFormat');
             const resultFileSize = document.getElementById('resultFileSize');
             const downloadAgainBtn = document.getElementById('downloadAgainBtn');
+            // Rounding DOM
+            const roundingToggle = document.getElementById('roundingToggle');
+            const roundingSection = document.getElementById('roundingSection');
+            const radiusSlider = document.getElementById('radiusSlider');
+            const radiusValue = document.getElementById('radiusValue');
+            const roundingIcon = document.getElementById('roundingIcon');
 
             // ==================== INITIALIZATION ====================
             function init() {
-                // Set logo
                 if (logoURL && logoURL.trim() !== '') {
                     logoImage.src = logoURL.trim();
                 } else {
                     logoImage.style.display = 'none';
                 }
 
-                // Set initial state
                 updateAspectIcon();
                 updateQualityVisibility();
+                updateRoundingVisibility();
                 updateResizeButton();
                 updateQualityDisplay();
-
-                // Attach event listeners
                 attachEvents();
             }
 
             function attachEvents() {
-                // File input - CRITICAL for mobile: reset value before each selection
-                // This ensures the change event fires even when the same file is selected twice
-                fileInput.addEventListener('click', function(e) {
-                    // Reset the value right before the file dialog opens
-                    // This allows re-selecting the same file on all platforms including iOS
+                // File input
+                fileInput.addEventListener('click', function() {
                     this.value = '';
                 });
 
-                fileInput.addEventListener('change', function(e) {
-                    // Use a small delay on mobile to ensure the event completes properly
+                fileInput.addEventListener('change', function() {
                     const file = this.files[0];
                     if (file) {
-                        // Store file info to detect duplicate selections
                         const fileFingerprint = file.name + '_' + file.size + '_' + file.lastModified;
                         if (fileFingerprint === lastProcessedFileName && lastProcessedFileTime && (Date.now() - lastProcessedFileTime < 2000)) {
-                            // Same file selected within 2 seconds - force reprocess by clearing tracker
                             lastProcessedFileName = null;
                             lastProcessedFileTime = null;
                         }
@@ -1194,20 +1222,12 @@
                         lastProcessedFileTime = Date.now();
                         processFile(file);
                     }
-                    // Reset value after processing to allow re-selection of the same file
-                    // Use setTimeout to ensure this runs after any pending events
                     setTimeout(() => {
-                        if (this.value) {
-                            this.value = '';
-                        }
+                        if (this.value) this.value = '';
                     }, 100);
                 });
 
-                // Upload zone interactions
-                uploadZone.addEventListener('click', function(e) {
-                    // Prevent any default label behavior that might interfere
-                    // The label's "for" attribute will handle opening the file dialog
-                    // But we also reset the file input value before opening
+                uploadZone.addEventListener('click', function() {
                     fileInput.value = '';
                 });
 
@@ -1219,20 +1239,6 @@
                     }
                 });
 
-                // Touch-specific handling for mobile devices
-                uploadZone.addEventListener('touchend', function(e) {
-                    // On some mobile browsers, the label click doesn't always trigger the file input
-                    // This provides a fallback without double-triggering
-                    if (e.target === uploadZone || uploadZone.contains(e.target)) {
-                        // The label's natural behavior should handle this
-                        // But ensure the file input is reset
-                        if (fileInput.value) {
-                            fileInput.value = '';
-                        }
-                    }
-                });
-
-                // Drag and drop
                 uploadZone.addEventListener('dragover', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -1259,23 +1265,21 @@
                     lastChangedField = 'width';
                     if (keepAspectRatio && originalAspectRatio > 0) {
                         const w = parseInt(inputWidth.value) || 0;
-                        if (w > 0) {
-                            inputHeight.value = Math.round(w / originalAspectRatio);
-                        }
+                        if (w > 0) inputHeight.value = Math.round(w / originalAspectRatio);
                     }
                     clearErrorStyles();
                     hideResult();
+                    updatePreview();
                 });
                 inputHeight.addEventListener('input', function() {
                     lastChangedField = 'height';
                     if (keepAspectRatio && originalAspectRatio > 0) {
                         const h = parseInt(inputHeight.value) || 0;
-                        if (h > 0) {
-                            inputWidth.value = Math.round(h * originalAspectRatio);
-                        }
+                        if (h > 0) inputWidth.value = Math.round(h * originalAspectRatio);
                     }
                     clearErrorStyles();
                     hideResult();
+                    updatePreview();
                 });
 
                 // Aspect ratio toggle
@@ -1285,17 +1289,14 @@
                     if (keepAspectRatio && originalAspectRatio > 0) {
                         if (lastChangedField === 'width') {
                             const w = parseInt(inputWidth.value) || originalWidth || 192;
-                            if (w > 0) {
-                                inputHeight.value = Math.round(w / originalAspectRatio);
-                            }
+                            if (w > 0) inputHeight.value = Math.round(w / originalAspectRatio);
                         } else {
                             const h = parseInt(inputHeight.value) || originalHeight || 192;
-                            if (h > 0) {
-                                inputWidth.value = Math.round(h * originalAspectRatio);
-                            }
+                            if (h > 0) inputWidth.value = Math.round(h * originalAspectRatio);
                         }
                     }
                     hideResult();
+                    updatePreview();
                 });
 
                 // Format buttons
@@ -1305,16 +1306,28 @@
                 // Quality slider
                 qualitySlider.addEventListener('input', updateQualityDisplay);
 
+                // Rounding controls
+                roundingToggle.addEventListener('change', function() {
+                    roundCorners = roundingToggle.checked;
+                    updateRoundingVisibility();
+                    updatePreview();
+                });
+                radiusSlider.addEventListener('input', function() {
+                    cornerRadius = parseInt(radiusSlider.value);
+                    radiusValue.textContent = cornerRadius + ' px';
+                    updatePreview();
+                });
+
                 // Resize button
                 resizeBtn.addEventListener('click', handleResizeAndDownload);
                 downloadAgainBtn.addEventListener('click', downloadResizedImage);
 
-                // Ripple effects on buttons
+                // Ripple effects
                 document.querySelectorAll('.btn').forEach(function(btn) {
                     btn.addEventListener('click', createRipple);
                 });
 
-                // Prevent zooming on double-tap for buttons on iOS
+                // Prevent zoom on double tap
                 document.addEventListener('dblclick', function(e) {
                     if (e.target.closest('.btn, .upload-zone, .format-btn, .toggle-switch')) {
                         e.preventDefault();
@@ -1324,25 +1337,17 @@
 
             // ==================== FILE HANDLING ====================
             function processFile(file) {
-                if (!file) {
-                    return;
-                }
+                if (!file) return;
 
-                // Validate file type - include HEIC/HEIF detection for better error messages
                 const validTypes = ['image/png', 'image/jpeg', 'image/webp'];
                 const heicTypes = ['image/heic', 'image/heif', 'image/heic-sequence', 'image/heif-sequence'];
-
                 if (heicTypes.includes(file.type)) {
-                    showToast('HEIC/HEIF images are not directly supported. Please convert to JPEG or PNG first, or use the Photos app to share as JPEG.', 'error');
+                    showToast('HEIC/HEIF images are not directly supported. Please convert to JPEG or PNG first.', 'error');
                     return;
                 }
-
                 if (!validTypes.includes(file.type) && file.type !== '') {
-                    // On iOS, files from the photo library may have empty type but valid data
-                    // Check file extension as fallback
                     const ext = file.name.split('.').pop().toLowerCase();
-                    const validExts = ['png', 'jpg', 'jpeg', 'webp'];
-                    if (!validExts.includes(ext)) {
+                    if (!['png', 'jpg', 'jpeg', 'webp'].includes(ext)) {
                         showToast('Unsupported file type. Please use PNG, JPEG, or WEBP.', 'error');
                         return;
                     }
@@ -1350,94 +1355,50 @@
 
                 originalFileName = file.name;
                 originalFileSize = file.size;
-
-                // Show a subtle loading state
                 previewBadgeText.textContent = 'Loading...';
                 previewBadge.classList.remove('hidden');
-                if (previewImage.classList.contains('hidden')) {
-                    previewPlaceholder.querySelector('span').textContent = 'Loading image...';
-                }
 
                 const reader = new FileReader();
-
                 reader.onload = function(ev) {
                     const dataUrl = ev.target.result;
                     if (!dataUrl) {
-                        showToast('Failed to read file. Please try again.', 'error');
+                        showToast('Failed to read file.', 'error');
                         resetPreviewState();
                         return;
                     }
-
-                    // Create a new Image for processing (separate from preview)
                     const img = new Image();
-
-                    // Set crossOrigin to anonymous for canvas compatibility
                     img.crossOrigin = 'anonymous';
-
                     img.onload = function() {
                         originalImage = img;
                         originalWidth = img.naturalWidth;
                         originalHeight = img.naturalHeight;
-
                         if (originalWidth === 0 || originalHeight === 0) {
-                            showToast('Could not determine image dimensions. The file may be corrupted.', 'error');
+                            showToast('Could not determine image dimensions.', 'error');
                             resetPreviewState();
                             return;
                         }
-
                         originalAspectRatio = originalWidth / originalHeight;
-
-                        // Update preview in the DOM
-                        previewImage.src = dataUrl;
-                        previewImage.classList.remove('hidden');
-                        previewPlaceholder.classList.add('hidden');
+                        previewBadgeText.textContent = (file.type.split('/')[1] || file.name.split('.').pop()).toUpperCase();
                         previewBadge.classList.remove('hidden');
-
-                        // Determine display format
-                        let displayFormat = file.type.split('/')[1] || '';
-                        if (!displayFormat && file.name) {
-                            displayFormat = file.name.split('.').pop().toUpperCase();
-                        }
-                        if (!displayFormat || displayFormat === '') {
-                            displayFormat = 'IMG';
-                        }
-                        previewBadgeText.textContent = displayFormat.toUpperCase();
-
-                        // Update info
                         imageInfoRow.classList.remove('hidden');
                         infoDimensions.textContent = originalWidth + ' × ' + originalHeight + ' px';
                         infoFileSize.textContent = formatFileSize(originalFileSize);
                         infoFileName.textContent = truncateFileName(originalFileName, 28);
-
-                        // Set resize inputs to original dimensions
                         inputWidth.value = originalWidth;
                         inputHeight.value = originalHeight;
                         lastChangedField = 'width';
-
-                        // Clear errors and results
                         clearErrorStyles();
                         hideResult();
                         updateResizeButton();
+                        updatePreview();
                     };
-
                     img.onerror = function() {
-                        showToast('Failed to decode image. The file may be corrupted or in an unsupported format (like HEIC). Please try a different image.', 'error');
+                        showToast('Failed to decode image. It may be corrupted or an unsupported format like HEIC.', 'error');
                         resetPreviewState();
                     };
-
-                    // Set the source to trigger loading
                     img.src = dataUrl;
-
-                    // For browsers that support decode(), use it for better reliability
                     if (img.decode && typeof img.decode === 'function') {
-                        // decode() is already being called via the onload above
-                        // but we can use it to ensure the image is fully decoded
-                        img.decode().then(function() {
-                            // Image is fully decoded and ready for canvas use
-                            // originalImage is already set from onload
-                        }).catch(function() {
-                            // decode() failed but onload may have succeeded
-                            // Only show error if originalImage wasn't set
+                        img.decode().then(function() {}).catch(function() {
                             if (!originalImage || originalImage !== img) {
                                 showToast('Failed to decode image for processing.', 'error');
                                 resetPreviewState();
@@ -1445,17 +1406,13 @@
                         });
                     }
                 };
-
                 reader.onerror = function() {
-                    showToast('Failed to read file. Please try again.', 'error');
+                    showToast('Failed to read file.', 'error');
                     resetPreviewState();
                 };
-
                 reader.onabort = function() {
                     resetPreviewState();
                 };
-
-                // Read the file as data URL
                 try {
                     reader.readAsDataURL(file);
                 } catch (err) {
@@ -1465,16 +1422,63 @@
             }
 
             function resetPreviewState() {
-                previewBadgeText.textContent = 'Uploaded';
                 previewBadge.classList.add('hidden');
-                previewPlaceholder.querySelector('span').textContent = 'No image uploaded';
-                if (!previewImage.classList.contains('hidden')) {
-                    previewImage.classList.add('hidden');
-                }
+                previewCanvas.classList.add('hidden');
                 previewPlaceholder.classList.remove('hidden');
                 imageInfoRow.classList.add('hidden');
                 originalImage = null;
                 updateResizeButton();
+                updatePreview();
+            }
+
+            // ==================== PREVIEW UPDATE ====================
+            function updatePreview() {
+                if (!originalImage) {
+                    previewCanvas.classList.add('hidden');
+                    previewPlaceholder.classList.remove('hidden');
+                    return;
+                }
+                const targetWidth = parseInt(inputWidth.value) || originalWidth;
+                const targetHeight = parseInt(inputHeight.value) || originalHeight;
+                const maxRadius = Math.floor(Math.min(targetWidth, targetHeight) / 2);
+                radiusSlider.max = maxRadius;
+                if (cornerRadius > maxRadius) {
+                    cornerRadius = maxRadius;
+                    radiusSlider.value = cornerRadius;
+                    radiusValue.textContent = cornerRadius + ' px';
+                }
+                // Set canvas resolution
+                previewCanvas.width = targetWidth;
+                previewCanvas.height = targetHeight;
+                const ctx = previewCanvas.getContext('2d');
+                ctx.clearRect(0, 0, targetWidth, targetHeight);
+                // Draw image
+                ctx.drawImage(originalImage, 0, 0, targetWidth, targetHeight);
+                // Apply rounding if enabled
+                if (roundCorners && cornerRadius > 0) {
+                    ctx.globalCompositeOperation = 'destination-in';
+                    ctx.beginPath();
+                    if (ctx.roundRect) {
+                        ctx.roundRect(0, 0, targetWidth, targetHeight, cornerRadius);
+                    } else {
+                        // Fallback for browsers without roundRect
+                        const r = cornerRadius;
+                        ctx.moveTo(r, 0);
+                        ctx.lineTo(targetWidth - r, 0);
+                        ctx.arcTo(targetWidth, 0, targetWidth, r, r);
+                        ctx.lineTo(targetWidth, targetHeight - r);
+                        ctx.arcTo(targetWidth, targetHeight, targetWidth - r, targetHeight, r);
+                        ctx.lineTo(r, targetHeight);
+                        ctx.arcTo(0, targetHeight, 0, targetHeight - r, r);
+                        ctx.lineTo(0, r);
+                        ctx.arcTo(0, 0, r, 0, r);
+                        ctx.closePath();
+                    }
+                    ctx.fill();
+                    ctx.globalCompositeOperation = 'source-over';
+                }
+                previewCanvas.classList.remove('hidden');
+                previewPlaceholder.classList.add('hidden');
             }
 
             // ==================== FORMAT SELECTION ====================
@@ -1487,16 +1491,18 @@
             }
 
             function updateQualityVisibility() {
-                if (outputFormat === 'jpeg') {
-                    qualitySection.classList.remove('hidden');
-                } else {
-                    qualitySection.classList.add('hidden');
-                }
+                qualitySection.classList.toggle('hidden', outputFormat !== 'jpeg');
             }
 
             function updateQualityDisplay() {
                 jpegQuality = parseInt(qualitySlider.value) / 100;
                 qualityValue.textContent = qualitySlider.value + '%';
+            }
+
+            // ==================== ROUNDING UI ====================
+            function updateRoundingVisibility() {
+                roundingSection.classList.toggle('hidden', !roundCorners);
+                roundingIcon.style.color = roundCorners ? 'var(--blue)' : 'var(--text-muted)';
             }
 
             // ==================== ASPECT RATIO ====================
@@ -1513,119 +1519,89 @@
             // ==================== RESIZE ENGINE ====================
             function performResize() {
                 return new Promise(function(resolve, reject) {
-                    if (!originalImage) {
-                        reject(new Error('No image uploaded'));
-                        return;
-                    }
-
+                    if (!originalImage) return reject(new Error('No image uploaded'));
                     const targetWidth = parseInt(inputWidth.value);
                     const targetHeight = parseInt(inputHeight.value);
+                    if (!targetWidth || targetWidth < 1 || isNaN(targetWidth)) return reject(new Error('Invalid width'));
+                    if (!targetHeight || targetHeight < 1 || isNaN(targetHeight)) return reject(new Error('Invalid height'));
+                    if (targetWidth > 10000 || targetHeight > 10000) return reject(new Error('Dimensions too large (max 10000px)'));
 
-                    // Validation
-                    if (!targetWidth || targetWidth < 1 || isNaN(targetWidth)) {
-                        reject(new Error('Invalid width'));
-                        return;
-                    }
-                    if (!targetHeight || targetHeight < 1 || isNaN(targetHeight)) {
-                        reject(new Error('Invalid height'));
-                        return;
-                    }
-                    if (targetWidth > 10000 || targetHeight > 10000) {
-                        reject(new Error('Dimensions too large (max 10000px)'));
-                        return;
-                    }
-
-                    // Create offscreen canvas
                     const canvas = document.createElement('canvas');
                     canvas.width = targetWidth;
                     canvas.height = targetHeight;
                     const ctx = canvas.getContext('2d');
-
-                    if (!ctx) {
-                        reject(new Error('Could not create canvas context'));
-                        return;
-                    }
-
-                    // High quality settings
+                    if (!ctx) return reject(new Error('Could not create canvas context'));
                     ctx.imageSmoothingEnabled = true;
-                    if ('imageSmoothingQuality' in ctx) {
-                        ctx.imageSmoothingQuality = 'high';
-                    }
+                    if ('imageSmoothingQuality' in ctx) ctx.imageSmoothingQuality = 'high';
 
-                    // Ensure the image is drawn correctly
                     try {
                         ctx.drawImage(originalImage, 0, 0, targetWidth, targetHeight);
                     } catch (drawErr) {
-                        reject(new Error('Failed to draw image on canvas. The image may be too large for this device.'));
-                        return;
+                        return reject(new Error('Failed to draw image on canvas.'));
                     }
 
-                    // Export
+                    // Apply corner rounding if enabled
+                    if (roundCorners && cornerRadius > 0) {
+                        const maxRadius = Math.floor(Math.min(targetWidth, targetHeight) / 2);
+                        const appliedRadius = Math.min(cornerRadius, maxRadius);
+                        if (appliedRadius > 0) {
+                            ctx.globalCompositeOperation = 'destination-in';
+                            ctx.beginPath();
+                            if (ctx.roundRect) {
+                                ctx.roundRect(0, 0, targetWidth, targetHeight, appliedRadius);
+                            } else {
+                                const r = appliedRadius;
+                                ctx.moveTo(r, 0);
+                                ctx.lineTo(targetWidth - r, 0);
+                                ctx.arcTo(targetWidth, 0, targetWidth, r, r);
+                                ctx.lineTo(targetWidth, targetHeight - r);
+                                ctx.arcTo(targetWidth, targetHeight, targetWidth - r, targetHeight, r);
+                                ctx.lineTo(r, targetHeight);
+                                ctx.arcTo(0, targetHeight, 0, targetHeight - r, r);
+                                ctx.lineTo(0, r);
+                                ctx.arcTo(0, 0, r, 0, r);
+                                ctx.closePath();
+                            }
+                            ctx.fill();
+                            ctx.globalCompositeOperation = 'source-over';
+                        }
+                    }
+
                     const mimeType = outputFormat === 'jpeg' ? 'image/jpeg' : 'image/png';
                     const quality = outputFormat === 'jpeg' ? jpegQuality : undefined;
 
-                    // Try toBlob first (modern browsers)
                     if (canvas.toBlob && typeof canvas.toBlob === 'function') {
                         try {
-                            canvas.toBlob(
-                                function(blob) {
-                                    if (blob && blob.size > 0) {
-                                        resizedBlob = blob;
-                                        resolve({
-                                            blob: blob,
-                                            width: targetWidth,
-                                            height: targetHeight,
-                                            format: outputFormat,
-                                            size: blob.size,
-                                        });
-                                    } else {
-                                        // Fallback to toDataURL if blob is empty
-                                        fallbackToDataURL(canvas, mimeType, quality, targetWidth, targetHeight, resolve,
-                                            reject);
-                                    }
-                                },
-                                mimeType,
-                                quality
-                            );
+                            canvas.toBlob(function(blob) {
+                                if (blob && blob.size > 0) {
+                                    resizedBlob = blob;
+                                    resolve({ blob, width: targetWidth, height: targetHeight, format: outputFormat, size: blob.size });
+                                } else {
+                                    fallbackToDataURL(canvas, mimeType, quality, targetWidth, targetHeight, resolve, reject);
+                                }
+                            }, mimeType, quality);
                         } catch (blobErr) {
                             fallbackToDataURL(canvas, mimeType, quality, targetWidth, targetHeight, resolve, reject);
                         }
                     } else {
-                        // Fallback for older browsers
                         fallbackToDataURL(canvas, mimeType, quality, targetWidth, targetHeight, resolve, reject);
                     }
                 });
             }
 
-            function fallbackToDataURL(canvas, mimeType, quality, targetWidth, targetHeight, resolve, reject) {
+            function fallbackToDataURL(canvas, mimeType, quality, width, height, resolve, reject) {
                 try {
                     const dataUrl = canvas.toDataURL(mimeType, quality);
-                    if (!dataUrl || dataUrl === 'data:,') {
-                        reject(new Error('Failed to export image'));
-                        return;
-                    }
-                    const parts = dataUrl.split(',');
-                    if (parts.length < 2) {
-                        reject(new Error('Failed to export image'));
-                        return;
-                    }
-                    const byteString = atob(parts[1]);
+                    if (!dataUrl || dataUrl === 'data:,') return reject(new Error('Failed to export image'));
+                    const byteString = atob(dataUrl.split(',')[1]);
                     const ab = new ArrayBuffer(byteString.length);
                     const ia = new Uint8Array(ab);
-                    for (let i = 0; i < byteString.length; i++) {
-                        ia[i] = byteString.charCodeAt(i);
-                    }
+                    for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
                     const blob = new Blob([ab], { type: mimeType });
                     resizedBlob = blob;
-                    resolve({
-                        blob: blob,
-                        width: targetWidth,
-                        height: targetHeight,
-                        format: outputFormat,
-                        size: blob.size,
-                    });
+                    resolve({ blob, width, height, format: outputFormat, size: blob.size });
                 } catch (err) {
-                    reject(new Error('Failed to export image: ' + (err.message || 'Unknown error')));
+                    reject(new Error('Failed to export image'));
                 }
             }
 
@@ -1634,25 +1610,17 @@
                 const ext = outputFormat === 'jpeg' ? 'jpg' : 'png';
                 const baseName = originalFileName.replace(/\.[^.]+$/, '') || 'image';
                 const filename = baseName + '-' + width + 'x' + height + '.' + ext;
-
-                // Use URL.createObjectURL for better mobile compatibility
                 const url = URL.createObjectURL(blob);
-
                 const anchor = document.createElement('a');
                 anchor.href = url;
                 anchor.download = filename;
                 anchor.style.display = 'none';
                 document.body.appendChild(anchor);
-
-                // Trigger download
                 anchor.click();
-
-                // Clean up
                 setTimeout(function() {
                     document.body.removeChild(anchor);
                     URL.revokeObjectURL(url);
                 }, 500);
-
                 return filename;
             }
 
@@ -1661,9 +1629,7 @@
                     showToast('No resized image available. Please resize first.', 'warning');
                     return;
                 }
-                const width = parseInt(inputWidth.value);
-                const height = parseInt(inputHeight.value);
-                triggerDownload(resizedBlob, width, height);
+                triggerDownload(resizedBlob, parseInt(inputWidth.value), parseInt(inputHeight.value));
             }
 
             // ==================== MAIN ACTION ====================
@@ -1673,11 +1639,8 @@
                     showToast('Please upload an image first.', 'warning');
                     return;
                 }
-
                 const targetWidth = parseInt(inputWidth.value);
                 const targetHeight = parseInt(inputHeight.value);
-
-                // Validate
                 if (!targetWidth || targetWidth < 1 || isNaN(targetWidth)) {
                     markError(inputWidth);
                     showToast('Please enter a valid width.', 'error');
@@ -1694,8 +1657,6 @@
                     showToast('Dimensions too large. Maximum is 10000px.', 'error');
                     return;
                 }
-
-                // Start processing
                 isProcessing = true;
                 resizeBtn.disabled = true;
                 resizeBtnText.textContent = 'Processing…';
@@ -1704,21 +1665,18 @@
 
                 performResize()
                     .then(function(result) {
-                        // Trigger download
                         triggerDownload(result.blob, result.width, result.height);
-                        // Show success
                         showResult(result);
                         resizeBtnText.textContent = 'Download Again';
-                        resizeBtn.classList.remove('processing-pulse');
-                        resizeBtn.disabled = false;
-                        isProcessing = false;
                     })
                     .catch(function(err) {
                         showToast(err.message || 'An error occurred during resizing.', 'error');
                         resizeBtnText.textContent = 'Resize & Download';
-                        resizeBtn.classList.remove('processing-pulse');
-                        resizeBtn.disabled = false;
+                    })
+                    .finally(function() {
                         isProcessing = false;
+                        resizeBtn.disabled = false;
+                        resizeBtn.classList.remove('processing-pulse');
                     });
             }
 
@@ -1728,12 +1686,9 @@
                 resultFormat.textContent = result.format.toUpperCase();
                 resultFileSize.textContent = formatFileSize(result.size);
                 resultCard.classList.remove('hidden');
-                // Re-trigger animation
                 resultCard.style.animation = 'none';
-                // Force reflow
                 void resultCard.offsetHeight;
                 resultCard.style.animation = '';
-                // Scroll into view
                 resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
 
@@ -1742,20 +1697,13 @@
             }
 
             function updateResizeButton() {
-                if (originalImage) {
-                    resizeBtn.disabled = false;
-                    resizeBtnText.textContent = 'Resize & Download';
-                } else {
-                    resizeBtn.disabled = true;
-                    resizeBtnText.textContent = 'Resize & Download';
-                }
+                resizeBtn.disabled = !originalImage;
+                resizeBtnText.textContent = 'Resize & Download';
             }
 
             function markError(inputEl) {
                 inputEl.classList.add('error');
-                setTimeout(function() {
-                    inputEl.classList.remove('error');
-                }, 600);
+                setTimeout(() => inputEl.classList.remove('error'), 600);
             }
 
             function clearErrorStyles() {
@@ -1765,64 +1713,27 @@
 
             // ==================== TOAST ====================
             function showToast(message, type) {
-                // Remove existing toast
                 const existing = document.querySelector('.toast-notification');
-                if (existing) {
-                    existing.remove();
-                }
-
+                if (existing) existing.remove();
                 const toast = document.createElement('div');
                 toast.className = 'toast-notification';
                 toast.setAttribute('role', 'alert');
                 toast.setAttribute('aria-live', 'assertive');
-                const bgColor = type === 'error' ? 'var(--red)' : type === 'warning' ? 'var(--yellow)' : 'var(--blue)';
-                const textColor = type === 'warning' ? '#1a1a2e' : '#fff';
-                toast.style.cssText =
-                    'position: fixed;' +
-                    'bottom: max(30px, calc(env(safe-area-inset-bottom, 0px) + 20px));' +
-                    'left: 50%;' +
-                    'transform: translateX(-50%);' +
-                    'background: ' + bgColor + ';' +
-                    'color: ' + textColor + ';' +
-                    'padding: 12px 20px;' +
-                    'border-radius: 24px;' +
-                    'font-family: var(--font);' +
-                    'font-size: 0.82rem;' +
-                    'font-weight: 600;' +
-                    'letter-spacing: 0.01em;' +
-                    'z-index: 1000;' +
-                    'box-shadow: 0 8px 32px rgba(0,0,0,0.5);' +
-                    'animation: toastIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;' +
-                    'max-width: 90vw;' +
-                    'text-align: center;' +
-                    'pointer-events: none;' +
-                    'word-wrap: break-word;';
+                const bg = type === 'error' ? 'var(--red)' : type === 'warning' ? 'var(--yellow)' : 'var(--blue)';
+                const color = type === 'warning' ? '#1a1a2e' : '#fff';
+                toast.style.cssText = 'position:fixed;bottom:max(30px,calc(env(safe-area-inset-bottom,0px)+20px));left:50%;transform:translateX(-50%);background:' + bg + ';color:' + color + ';padding:12px 20px;border-radius:24px;font-family:var(--font);font-size:0.82rem;font-weight:600;letter-spacing:0.01em;z-index:1000;box-shadow:0 8px 32px rgba(0,0,0,0.5);animation:toastIn 0.35s cubic-bezier(0.175,0.885,0.32,1.275) both;max-width:90vw;text-align:center;pointer-events:none;word-wrap:break-word;';
                 document.body.appendChild(toast);
-
-                setTimeout(function() {
+                setTimeout(() => {
                     toast.style.animation = 'toastOut 0.3s ease forwards';
-                    setTimeout(function() {
-                        if (toast.parentNode) {
-                            toast.parentNode.removeChild(toast);
-                        }
-                    }, 300);
+                    setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 300);
                 }, 2500);
             }
 
-            // Add toast keyframes dynamically
             const toastStyle = document.createElement('style');
-            toastStyle.textContent =
-                '@keyframes toastIn {' +
-                'from { opacity: 0; transform: translateX(-50%) translateY(20px) scale(0.9); }' +
-                'to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }' +
-                '}' +
-                '@keyframes toastOut {' +
-                'from { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }' +
-                'to { opacity: 0; transform: translateX(-50%) translateY(10px) scale(0.9); }' +
-                '}';
+            toastStyle.textContent = '@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(20px) scale(0.9)}to{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}}@keyframes toastOut{from{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}to{opacity:0;transform:translateX(-50%) translateY(10px) scale(0.9)}}';
             document.head.appendChild(toastStyle);
 
-            // ==================== RIPPLE EFFECT ====================
+            // ==================== RIPPLE ====================
             function createRipple(e) {
                 const btn = e.currentTarget;
                 const ripple = document.createElement('span');
@@ -1834,11 +1745,7 @@
                 ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
                 ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
                 btn.appendChild(ripple);
-                ripple.addEventListener('animationend', function() {
-                    if (ripple.parentNode) {
-                        ripple.parentNode.removeChild(ripple);
-                    }
-                });
+                ripple.addEventListener('animationend', () => { if (ripple.parentNode) ripple.parentNode.removeChild(ripple); });
             }
 
             // ==================== UTILITIES ====================
@@ -1852,8 +1759,7 @@
                 if (name.length <= maxLen) return name;
                 const ext = name.split('.').pop();
                 const base = name.substring(0, name.length - ext.length - 1);
-                const truncated = base.substring(0, maxLen - ext.length - 4) + '…';
-                return truncated + '.' + ext;
+                return base.substring(0, maxLen - ext.length - 4) + '…' + '.' + ext;
             }
 
             // ==================== STARTUP ====================
