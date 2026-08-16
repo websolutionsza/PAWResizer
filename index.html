@@ -972,6 +972,97 @@
                 max-height: 180px;
             }
         }
+
+        /* ==================== HELP MODAL ADDITIONS ==================== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 20px;
+            animation: fadeIn 0.2s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .help-table-container {
+            overflow-x: auto;
+            margin: 0 -4px;
+            padding: 0 4px;
+        }
+        .help-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+        .help-table th {
+            text-align: left;
+            padding: 8px 6px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+        .help-table td {
+            padding: 12px 6px;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+        .help-table tr:last-child td {
+            border-bottom: none;
+        }
+        .help-table .size-cell {
+            font-weight: 600;
+            color: var(--text);
+            white-space: nowrap;
+        }
+        .help-table .purpose-cell {
+            font-size: 0.75rem;
+            line-height: 1.3;
+        }
+        .use-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--blue);
+            cursor: pointer;
+            transition: all var(--transition);
+            -webkit-tap-highlight-color: transparent;
+            min-height: 32px;
+            white-space: nowrap;
+        }
+        .use-btn:hover {
+            border-color: var(--blue);
+            background: var(--blue-subtle);
+            box-shadow: 0 0 12px var(--blue-glow);
+        }
+        .use-btn:active {
+            transform: scale(0.96);
+        }
+        .use-btn .material-symbols-outlined {
+            font-size: 14px;
+        }
+        /* ============================================================ */
     </style>
 </head>
 <body>
@@ -1026,6 +1117,10 @@
             <div class="card-header yellow-icon">
                 <span class="material-symbols-outlined">tune</span>
                 <span class="card-label">Resize Dimensions</span>
+                <!-- NEW HELP BUTTON -->
+                <button class="btn btn-icon" id="helpBtn" aria-label="Open Help" style="margin-left: auto; border: 1px solid var(--border); color: var(--text-secondary);">
+                    <span class="material-symbols-outlined">help</span>
+                </button>
             </div>
             <div class="resize-row">
                 <div class="input-group">
@@ -1129,6 +1224,63 @@
         </footer>
     </div>
 
+    <!-- NEW HELP MODAL -->
+    <div class="modal-overlay hidden" id="helpModal">
+        <div class="card" style="width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; z-index: 101; margin: 0;">
+            <div class="card-header">
+                <span class="material-symbols-outlined">info</span>
+                <span class="card-label">PWA Size Guide</span>
+                <button class="btn btn-icon" id="closeHelpBtn" aria-label="Close Help" style="margin-left: auto; border: 1px solid var(--border); color: var(--text-secondary);">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="help-table-container">
+                <table class="help-table">
+                    <thead>
+                        <tr>
+                            <th>Icon type</th>
+                            <th>Size</th>
+                            <th>Purpose</th>
+                            <th style="text-align: right;">Use</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Standard PWA</td>
+                            <td class="size-cell">192×192</td>
+                            <td class="purpose-cell">Standard Android/PWA icon</td>
+                            <td style="text-align: right;"><button class="use-btn" data-width="192" data-height="192"><span class="material-symbols-outlined">check</span> Use</button></td>
+                        </tr>
+                        <tr>
+                            <td>High-res PWA</td>
+                            <td class="size-cell">512×512</td>
+                            <td class="purpose-cell">High-resolution PWA icon</td>
+                            <td style="text-align: right;"><button class="use-btn" data-width="512" data-height="512"><span class="material-symbols-outlined">check</span> Use</button></td>
+                        </tr>
+                        <tr>
+                            <td>Apple Touch</td>
+                            <td class="size-cell">180×180</td>
+                            <td class="purpose-cell">iPhone/iOS apple-touch-icon.png</td>
+                            <td style="text-align: right;"><button class="use-btn" data-width="180" data-height="180"><span class="material-symbols-outlined">check</span> Use</button></td>
+                        </tr>
+                        <tr>
+                            <td>Maskable PWA</td>
+                            <td class="size-cell">192×192</td>
+                            <td class="purpose-cell">Android adaptive/maskable icon</td>
+                            <td style="text-align: right;"><button class="use-btn" data-width="192" data-height="192"><span class="material-symbols-outlined">check</span> Use</button></td>
+                        </tr>
+                        <tr>
+                            <td>Maskable PWA</td>
+                            <td class="size-cell">512×512</td>
+                            <td class="purpose-cell">High-res adaptive/maskable icon</td>
+                            <td style="text-align: right;"><button class="use-btn" data-width="512" data-height="512"><span class="material-symbols-outlined">check</span> Use</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <script>
         (function() {
             // ==================== CONFIGURATION ====================
@@ -1187,6 +1339,12 @@
             const radiusSlider = document.getElementById('radiusSlider');
             const radiusValue = document.getElementById('radiusValue');
             const roundingIcon = document.getElementById('roundingIcon');
+            
+            // HELP MODAL DOM
+            const helpBtn = document.getElementById('helpBtn');
+            const helpModal = document.getElementById('helpModal');
+            const closeHelpBtn = document.getElementById('closeHelpBtn');
+            const helpTableBody = document.querySelector('.help-table tbody');
 
             // ==================== INITIALIZATION ====================
             function init() {
@@ -1333,6 +1491,41 @@
                         e.preventDefault();
                     }
                 }, { passive: false });
+
+                // ==================== HELP MODAL EVENTS ====================
+                helpBtn.addEventListener('click', function() {
+                    helpModal.classList.remove('hidden');
+                });
+
+                closeHelpBtn.addEventListener('click', function() {
+                    helpModal.classList.add('hidden');
+                });
+
+                helpModal.addEventListener('click', function(e) {
+                    if (e.target === helpModal) {
+                        helpModal.classList.add('hidden');
+                    }
+                });
+
+                helpTableBody.addEventListener('click', function(e) {
+                    const useBtn = e.target.closest('.use-btn');
+                    if (!useBtn) return;
+                    
+                    const w = useBtn.dataset.width;
+                    const h = useBtn.dataset.height;
+                    
+                    inputWidth.value = w;
+                    inputHeight.value = h;
+                    updatePreview(); // Uses existing preview update function
+                    helpModal.classList.add('hidden');
+                    
+                    if (!originalImage) {
+                        showToast('Please upload an image first to use this size.', 'warning');
+                    } else {
+                        showToast('Size applied. Ready to download.', 'blue');
+                    }
+                });
+                // =========================================================
             }
 
             // ==================== FILE HANDLING ====================
