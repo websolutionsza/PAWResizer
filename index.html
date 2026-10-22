@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>PAW Resizer</title>
+    <title>PWA Resizer</title>
 
-    <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/websolutionsza/PAWResizer/refs/heads/main/logo-180x180.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="https://raw.githubusercontent.com/websolutionsza/PAWResizer/refs/heads/main/logo-512x512.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/websolutionsza/PWAResizer/refs/heads/main/logo-180x180.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="https://raw.githubusercontent.com/websolutionsza/PWAResizer/refs/heads/main/logo-512x512.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="theme-color" content="#ffffff">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="description" content="PAW Resizer - Precision PWA image resizing. 100% client-side, privacy-first image processing in your browser.">
+    <meta name="description" content="PWA Resizer - Precision PWA image resizing. 100% client-side, privacy-first image processing in your browser.">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1252,9 +1252,9 @@
     <!-- ========== TOPBAR ========== -->
     <header class="topbar">
         <div class="topbar-brand">
-            <img id="logoImage" class="logo-img" src="" alt="PAW Resizer" onerror="this.style.display='none'">
+            <img id="logoImage" class="logo-img" src="" alt="PWA Resizer" onerror="this.style.display='none'">
             <div class="topbar-titles">
-                <h1 class="app-title">PAW<span class="accent-dot"></span>Resizer</h1>
+                <h1 class="app-title">PWA<span class="accent-dot"></span>Resizer</h1>
                 <p class="app-subtitle">Precision Image Resizing</p>
             </div>
         </div>
@@ -1603,7 +1603,10 @@
 
     <!-- Footer -->
     <footer class="app-footer">
-        <a href="https://www.buymeacoffee.com/" target="_blank" rel="noopener noreferrer" class="coffee-link" id="coffeeLink">
+        <!-- BUY ME A COFFEE PLACEHOLDER: This button is currently inactive (opens nothing).
+     To activate it, add your personal Buy Me a Coffee link to the <a> tag below.
+     Example: <a href="https://www.buymeacoffee.com/YOUR-USERNAME" target="_blank" rel="noopener noreferrer" class="coffee-link" id="coffeeLink"> -->
+            <a class="coffee-link" id="coffeeLink">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
             Buy me a coffee
         </a>
@@ -1613,7 +1616,7 @@
             <a href="https://websolutionssa.pages.dev/" target="_blank" rel="noopener noreferrer">Website</a>
         </div>
         <div class="footer-copyright">
-            &copy; 2026 PAW Resizer. All rights reserved. | Created and developed by <a href="https://websolutionssa.pages.dev/" target="_blank" rel="noopener noreferrer">websolutionssa</a>
+            &copy; 2026 PWA Resizer. All rights reserved. | Created and developed by <a href="https://websolutionssa.pages.dev/" target="_blank" rel="noopener noreferrer">websolutionssa</a>
         </div>
     </footer>
 
@@ -1709,7 +1712,7 @@
     <script>
         (function() {
             // ==================== CONFIGURATION ====================
-            const logoURL = 'https://raw.githubusercontent.com/websolutionsza/PAWResizer/refs/heads/main/logo-512x512.png';
+            const logoURL = 'https://raw.githubusercontent.com/websolutionsza/PWAResizer/refs/heads/main/logo-512x512.png';
 
             // ==================== SVG ICONS ====================
             const SVG_LOCK = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
@@ -1859,7 +1862,7 @@
 
             // ==================== THEME ====================
             function initTheme() {
-                const savedTheme = localStorage.getItem('paw-theme') || 'light';
+                const savedTheme = localStorage.getItem('pwa-theme') || 'light';
                 document.documentElement.setAttribute('data-theme', savedTheme);
                 updateThemeMeta(savedTheme);
             }
@@ -1875,7 +1878,7 @@
                     const current = document.documentElement.getAttribute('data-theme');
                     const next = current === 'light' ? 'dark' : 'light';
                     document.documentElement.setAttribute('data-theme', next);
-                    localStorage.setItem('paw-theme', next);
+                    localStorage.setItem('pwa-theme', next);
                     updateThemeMeta(next);
                 });
 
@@ -2864,7 +2867,7 @@
                 return {
                     name: 'PWA App',
                     short_name: 'PWA',
-                    description: 'Generated by PAW Resizer',
+                    description: 'Generated by PWA Resizer',
                     start_url: '/',
                     display: 'standalone',
                     background_color: bgEnabled && bgType !== 'transparent' ? (bgType === 'gradient' ? bgColor1G.value : bgColor1.value) : '#08080f',
