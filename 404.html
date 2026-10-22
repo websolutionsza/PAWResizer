@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Page Not Found - PAW Resizer</title>
+    <title>Page Not Found - PWA Resizer</title>
 
-    <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/websolutionsza/PAWResizer/refs/heads/main/logo-180x180.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="https://raw.githubusercontent.com/websolutionsza/PAWResizer/refs/heads/main/logo-512x512.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/websolutionsza/PWAResizer/refs/heads/main/logo-180x180.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="https://raw.githubusercontent.com/websolutionsza/PWAResizer/refs/heads/main/logo-512x512.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="theme-color" content="#ffffff">
@@ -488,9 +488,9 @@
     <!-- ========== TOPBAR ========== -->
     <header class="topbar">
         <a href="index.html" class="topbar-brand">
-            <img class="logo-img" src="https://raw.githubusercontent.com/websolutionsza/PAWResizer/refs/heads/main/logo-512x512.png" alt="PAW Resizer" onerror="this.style.display='none'">
+            <img class="logo-img" src="https://raw.githubusercontent.com/websolutionsza/PWAResizer/refs/heads/main/logo-512x512.png" alt="PWA Resizer" onerror="this.style.display='none'">
             <div class="topbar-titles">
-                <h1 class="app-title">PAW<span class="accent-dot"></span>Resizer</h1>
+                <h1 class="app-title">PWA<span class="accent-dot"></span>Resizer</h1>
                 <p class="app-subtitle">Precision Image Resizing</p>
             </div>
         </a>
@@ -518,7 +518,7 @@
 
             <a href="index.html" class="primary-action">
                 <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                Back to PAW Resizer
+                Back to PWA Resizer
             </a>
 
             <div class="divider">Or reach us directly</div>
@@ -547,7 +547,7 @@
                 </a>
             </div>
 
-            <a href="https://wa.me/27649890296?text=Hi%2C%20I%20want%20to%20report%20a%20problem%20on%20PAW%20Resizer." target="_blank" rel="noopener noreferrer" class="report-btn" aria-label="Report a problem">
+            <a href="https://wa.me/27649890296?text=Hi%2C%20I%20want%20to%20report%20a%20problem%20on%20PWA%20Resizer." target="_blank" rel="noopener noreferrer" class="report-btn" aria-label="Report a problem">
                 <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                 Report a problem
             </a>
@@ -556,7 +556,10 @@
 
     <!-- ========== FOOTER ========== -->
     <footer class="app-footer">
-        <a href="https://www.buymeacoffee.com/" target="_blank" rel="noopener noreferrer" class="coffee-link">
+        <!-- BUY ME A COFFEE PLACEHOLDER: This button is currently inactive (opens nothing).
+     To activate it, add your personal Buy Me a Coffee link to the <a> tag below.
+     Example: <a href="https://www.buymeacoffee.com/YOUR-USERNAME" target="_blank" rel="noopener noreferrer" class="coffee-link"> -->
+            <a class="coffee-link">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
             Buy me a coffee
         </a>
@@ -566,14 +569,14 @@
             <a href="privacy-policy.html">Privacy Policy</a>
         </div>
         <div class="footer-copyright">
-            &copy; 2026 PAW Resizer. All rights reserved. | Created and developed by <a href="https://websolutionssa.pages.dev/" target="_blank" rel="noopener noreferrer">websolutionssa</a>
+            &copy; 2026 PWA Resizer. All rights reserved. | Created and developed by <a href="https://websolutionssa.pages.dev/" target="_blank" rel="noopener noreferrer">websolutionssa</a>
         </div>
     </footer>
 
     <script>
         (function() {
             const themeToggle = document.getElementById('themeToggle');
-            const savedTheme = localStorage.getItem('paw-theme') || 'light';
+            const savedTheme = localStorage.getItem('pwa-theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
             const meta = document.querySelector('meta[name="theme-color"]');
             if (meta) meta.setAttribute('content', savedTheme === 'dark' ? '#0a0a0a' : '#ffffff');
@@ -582,7 +585,7 @@
                 const current = document.documentElement.getAttribute('data-theme');
                 const next = current === 'light' ? 'dark' : 'light';
                 document.documentElement.setAttribute('data-theme', next);
-                localStorage.setItem('paw-theme', next);
+                localStorage.setItem('pwa-theme', next);
                 if (meta) meta.setAttribute('content', next === 'dark' ? '#0a0a0a' : '#ffffff');
             });
         })();
