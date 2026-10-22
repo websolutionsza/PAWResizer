@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Help Guide - PAW Resizer</title>
+    <title>Help Guide - PWA Resizer</title>
 
-    <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/websolutionsza/PAWResizer/refs/heads/main/logo-180x180.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="https://raw.githubusercontent.com/websolutionsza/PAWResizer/refs/heads/main/logo-512x512.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/websolutionsza/PWAResizer/refs/heads/main/logo-180x180.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="https://raw.githubusercontent.com/websolutionsza/PWAResizer/refs/heads/main/logo-512x512.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="theme-color" content="#ffffff">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="description" content="PAW Resizer help guide - learn how to upload images, use maskable safe-zones, adjust padding and backgrounds, and export single files or ZIP packages.">
+    <meta name="description" content="PWA Resizer help guide - learn how to upload images, use maskable safe-zones, adjust padding and backgrounds, and export single files or ZIP packages.">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -488,9 +488,9 @@
     <!-- ========== TOPBAR ========== -->
     <header class="topbar">
         <a href="index.html" class="topbar-brand">
-            <img id="logoImage" class="logo-img" src="https://raw.githubusercontent.com/websolutionsza/PAWResizer/refs/heads/main/logo-512x512.png" alt="PAW Resizer" onerror="this.style.display='none'">
+            <img id="logoImage" class="logo-img" src="https://raw.githubusercontent.com/websolutionsza/PWAResizer/refs/heads/main/logo-512x512.png" alt="PWA Resizer" onerror="this.style.display='none'">
             <div class="topbar-titles">
-                <h1 class="app-title">PAW<span class="accent-dot"></span>Resizer</h1>
+                <h1 class="app-title">PWA<span class="accent-dot"></span>Resizer</h1>
                 <p class="app-subtitle">Precision Image Resizing</p>
             </div>
         </a>
@@ -511,7 +511,7 @@
             <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
             User Guide
         </span>
-        <h1>How to use PAW Resizer</h1>
+        <h1>How to use PWA Resizer</h1>
         <p>A clear, step-by-step walkthrough covering image uploads, maskable safe-zones, padding and backgrounds, and exporting single files or full ZIP packages - all processed privately in your browser.</p>
     </section>
 
@@ -530,7 +530,7 @@
                 <span class="step-number">01</span>
                 <h2 class="step-title">Uploading Images</h2>
             </div>
-            <p>PAW Resizer accepts PNG, JPEG, WEBP, and SVG files. Everything you upload stays on your device - the image is read into memory and drawn onto an HTML5 Canvas entirely in your browser. No file is ever transmitted to a server.</p>
+            <p>PWA Resizer accepts PNG, JPEG, WEBP, and SVG files. Everything you upload stays on your device - the image is read into memory and drawn onto an HTML5 Canvas entirely in your browser. No file is ever transmitted to a server.</p>
 
             <h3>Single file upload</h3>
             <p>Click anywhere inside the dashed upload zone, or tap it on mobile. Your device's file picker will open. Select one image and it will load into the preview pane within a second. The original dimensions, file size, and filename are displayed beneath the preview so you always know what you are working with.</p>
@@ -545,7 +545,7 @@
 
             <div class="callout tip">
                 <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                <span>SVG files are rasterized cleanly at whatever dimension you choose. If your SVG has no intrinsic size, PAW Resizer reads its viewBox and uses that as the source dimensions, defaulting to 512x512 if neither is present.</span>
+                <span>SVG files are rasterized cleanly at whatever dimension you choose. If your SVG has no intrinsic size, PWA Resizer reads its viewBox and uses that as the source dimensions, defaulting to 512x512 if neither is present.</span>
             </div>
 
             <h3>Cropping before resizing</h3>
@@ -615,7 +615,7 @@
                 <span class="step-number">04</span>
                 <h2 class="step-title">Exporting Single Files vs ZIP Packages</h2>
             </div>
-            <p>PAW Resizer offers two export modes, controlled by the chips in the Batch and Package card: Single File and ZIP Package. Each serves a different stage of your workflow.</p>
+            <p>PWA Resizer offers two export modes, controlled by the chips in the Batch and Package card: Single File and ZIP Package. Each serves a different stage of your workflow.</p>
 
             <h3>Single File export</h3>
             <p>Choose <strong>Single File</strong> to export the current image at exactly the dimensions shown in the Resize Dimensions card, using the selected output format (PNG or JPEG). Click <strong>Resize and Download</strong> and the file downloads immediately with a name like <span class="inline-code">logo-192x192.png</span>. This is the fastest path when you need one specific size - for example, generating a 180x180 apple-touch-icon or a 32x32 favicon.</p>
@@ -654,7 +654,10 @@
 
     <!-- ========== FOOTER ========== -->
     <footer class="app-footer">
-        <a href="https://www.buymeacoffee.com/" target="_blank" rel="noopener noreferrer" class="coffee-link">
+        <!-- BUY ME A COFFEE PLACEHOLDER: This button is currently inactive (opens nothing).
+     To activate it, add your personal Buy Me a Coffee link to the <a> tag below.
+     Example: <a href="https://www.buymeacoffee.com/YOUR-USERNAME" target="_blank" rel="noopener noreferrer" class="coffee-link"> -->
+            <a class="coffee-link">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
             Buy me a coffee
         </a>
@@ -664,14 +667,14 @@
             <a href="https://websolutionssa.pages.dev/" target="_blank" rel="noopener noreferrer">Website</a>
         </div>
         <div class="footer-copyright">
-            &copy; 2026 PAW Resizer. All rights reserved. | Created and developed by <a href="https://websolutionssa.pages.dev/" target="_blank" rel="noopener noreferrer">websolutionssa</a>
+            &copy; 2026 PWA Resizer. All rights reserved. | Created and developed by <a href="https://websolutionssa.pages.dev/" target="_blank" rel="noopener noreferrer">websolutionssa</a>
         </div>
     </footer>
 
     <script>
         (function() {
             const themeToggle = document.getElementById('themeToggle');
-            const savedTheme = localStorage.getItem('paw-theme') || 'light';
+            const savedTheme = localStorage.getItem('pwa-theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
             const meta = document.querySelector('meta[name="theme-color"]');
             if (meta) meta.setAttribute('content', savedTheme === 'dark' ? '#0a0a0a' : '#ffffff');
@@ -680,7 +683,7 @@
                 const current = document.documentElement.getAttribute('data-theme');
                 const next = current === 'light' ? 'dark' : 'light';
                 document.documentElement.setAttribute('data-theme', next);
-                localStorage.setItem('paw-theme', next);
+                localStorage.setItem('pwa-theme', next);
                 if (meta) meta.setAttribute('content', next === 'dark' ? '#0a0a0a' : '#ffffff');
             });
         })();
