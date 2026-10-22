@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Help Guide - PAW Resizer</title>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/websolutionsza/PAWResizer/refs/heads/main/logo-180x180.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="https://raw.githubusercontent.com/websolutionsza/PAWResizer/refs/heads/main/logo-512x512.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="description" content="PAW Resizer help guide - learn how to upload images, use maskable safe-zones, adjust padding and backgrounds, and export single files or ZIP packages.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* ========== CSS VARIABLES ========== */
+        :root {
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+            --safe-left: env(safe-area-inset-left, 0px);
+            --safe-right: env(safe-area-inset-right, 0px);
+
+            --bg: #ffffff;
+            --bg-subtle: #f8fafc;
+            --surface: #ffffff;
+            --surface-hover: #f1f5f9;
+            --surface-elevated: #ffffff;
+            --border: #e2e8f0;
+            --border-strong: #cbd5e1;
+            --border-focus: #94a3b8;
+            --text: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+
+            --blue: #2563eb;
+            --blue-hover: #1d4ed8;
+            --blue-glow: rgba(37, 99, 235, 0.12);
+            --blue-subtle: rgba(37, 99, 235, 0.06);
+
+            --red: #dc2626;
+            --red-subtle: rgba(220, 38, 38, 0.06);
+
+            --yellow: #d97706;
+            --yellow-subtle: rgba(217, 119, 6, 0.06);
+
+            --green: #16a34a;
+            --green-glow: rgba(22, 163, 74, 0.12);
+            --green-subtle: rgba(22, 163, 74, 0.06);
+
+            --coffee: #ff813f;
+            --coffee-hover: #ff7029;
+            --coffee-subtle: rgba(255, 129, 63, 0.08);
+
+            --radius-sm: 6px;
+            --radius: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+            --font: 'Inter', system-ui, -apple-system, sans-serif;
+            --transition: 0.15s ease;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
+
+            --font-xs: clamp(0.7rem, 0.68rem + 0.1vw, 0.75rem);
+            --font-sm: clamp(0.78rem, 0.76rem + 0.1vw, 0.85rem);
+            --font-base: clamp(0.85rem, 0.83rem + 0.1vw, 0.9rem);
+            --font-md: clamp(0.9rem, 0.87rem + 0.15vw, 1rem);
+            --font-lg: clamp(1rem, 0.95rem + 0.25vw, 1.15rem);
+            --font-xl: clamp(1.15rem, 1.05rem + 0.5vw, 1.5rem);
+            --font-2xl: clamp(1.5rem, 1.3rem + 1vw, 2.25rem);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0a0a0a;
+            --bg-subtle: #111111;
+            --surface: #161616;
+            --surface-hover: #1f1f1f;
+            --surface-elevated: #1a1a1a;
+            --border: #262626;
+            --border-strong: #404040;
+            --border-focus: #525252;
+            --text: #fafafa;
+            --text-secondary: #a3a3a3;
+            --text-muted: #737373;
+
+            --blue: #3b82f6;
+            --blue-hover: #60a5fa;
+            --blue-glow: rgba(59, 130, 246, 0.15);
+            --blue-subtle: rgba(59, 130, 246, 0.08);
+
+            --red: #ef4444;
+            --red-subtle: rgba(239, 68, 68, 0.08);
+
+            --yellow: #f59e0b;
+            --yellow-subtle: rgba(245, 158, 11, 0.08);
+
+            --green: #22c55e;
+            --green-glow: rgba(34, 197, 94, 0.15);
+            --green-subtle: rgba(34, 197, 94, 0.08);
+
+            --coffee: #ff813f;
+            --coffee-hover: #ff9461;
+            --coffee-subtle: rgba(255, 129, 63, 0.12);
+
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html {
+            font-size: 16px;
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-tap-highlight-color: transparent;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            min-height: 100dvh;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            overflow-x: hidden;
+        }
+
+        .icon { width: 18px; height: 18px; flex-shrink: 0; display: block; }
+        .icon-sm { width: 14px; height: 14px; }
+        .icon-lg { width: 22px; height: 22px; }
+
+        /* ========== TOPBAR ========== */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 20px;
+            padding-top: max(12px, var(--safe-top));
+            padding-left: max(20px, var(--safe-left));
+            padding-right: max(20px, var(--safe-right));
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .topbar-brand { display: flex; align-items: center; gap: 12px; min-width: 0; text-decoration: none; }
+
+        .logo-img {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius);
+            object-fit: contain;
+            display: block;
+            background: var(--bg-subtle);
+            flex-shrink: 0;
+        }
+        .logo-img[src=""] { display: none; }
+
+        .topbar-titles { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+
+        .app-title {
+            font-size: var(--font-lg);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--text);
+            line-height: 1.2;
+            white-space: nowrap;
+        }
+        .accent-dot {
+            display: inline-block;
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            background: var(--blue);
+            margin: 0 3px;
+            vertical-align: middle;
+            position: relative;
+            top: -3px;
+        }
+        .app-subtitle {
+            font-size: var(--font-xs);
+            font-weight: 400;
+            color: var(--text-muted);
+            letter-spacing: 0.02em;
+            white-space: nowrap;
+        }
+
+        .topbar-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+
+        .btn-icon {
+            min-width: 36px;
+            min-height: 36px;
+            padding: 6px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-secondary);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-icon:hover { border-color: var(--border-strong); background: var(--surface-hover); color: var(--text); }
+
+        .theme-toggle .icon-sun { display: none; }
+        .theme-toggle .icon-moon { display: block; }
+        [data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+        [data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+
+        /* ========== HERO ========== */
+        .hero {
+            max-width: 820px;
+            margin: 0 auto;
+            padding: clamp(32px, 6vw, 56px) 20px clamp(16px, 3vw, 28px);
+            text-align: center;
+        }
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: var(--blue-subtle);
+            border: 1px solid var(--blue-glow);
+            color: var(--blue);
+            font-size: var(--font-xs);
+            font-weight: 600;
+            margin-bottom: 18px;
+        }
+        .hero h1 {
+            font-size: var(--font-2xl);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: var(--text);
+            line-height: 1.15;
+            margin-bottom: 14px;
+        }
+        .hero p {
+            font-size: var(--font-md);
+            color: var(--text-secondary);
+            line-height: 1.6;
+            max-width: 620px;
+            margin: 0 auto;
+        }
+
+        /* ========== CONTENT WRAP ========== */
+        .content-wrap {
+            max-width: 820px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+            padding-left: max(20px, var(--safe-left));
+            padding-right: max(20px, var(--safe-right));
+            padding-bottom: max(40px, var(--safe-bottom));
+        }
+
+        .step-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 32px;
+        }
+        .step-nav a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-secondary);
+            font-size: var(--font-xs);
+            font-weight: 600;
+            text-decoration: none;
+            transition: all var(--transition);
+        }
+        .step-nav a:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-subtle); }
+        .step-nav a .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            background: var(--blue-subtle);
+            color: var(--blue);
+            font-size: 0.68rem;
+            font-weight: 700;
+        }
+
+        /* ========== STEP CARD ========== */
+        .step-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: clamp(20px, 4vw, 28px);
+            margin-bottom: 20px;
+            transition: border-color var(--transition);
+            scroll-margin-top: 90px;
+        }
+        .step-card:hover { border-color: var(--border-strong); }
+
+        .step-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 36px;
+            height: 36px;
+            padding: 0 10px;
+            border-radius: var(--radius);
+            background: var(--blue);
+            color: #fff;
+            font-size: var(--font-sm);
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .step-title {
+            font-size: var(--font-lg);
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: -0.01em;
+            line-height: 1.3;
+        }
+
+        .step-card h3 {
+            font-size: var(--font-md);
+            font-weight: 600;
+            color: var(--text);
+            margin: 20px 0 10px;
+            letter-spacing: -0.01em;
+        }
+        .step-card h3:first-of-type { margin-top: 4px; }
+
+        .step-card p {
+            font-size: var(--font-base);
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 12px;
+        }
+
+        .step-card ul, .step-card ol {
+            padding-left: 22px;
+            margin: 10px 0 14px;
+            color: var(--text-secondary);
+            font-size: var(--font-base);
+            line-height: 1.7;
+        }
+        .step-card li { margin-bottom: 6px; }
+        .step-card li strong { color: var(--text); font-weight: 600; }
+
+        .callout {
+            display: flex;
+            gap: 10px;
+            padding: 14px 16px;
+            border-radius: var(--radius);
+            background: var(--blue-subtle);
+            border: 1px solid var(--blue-glow);
+            margin: 14px 0;
+            font-size: var(--font-sm);
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        .callout svg { color: var(--blue); flex-shrink: 0; margin-top: 2px; }
+        .callout.tip { background: var(--green-subtle); border-color: var(--green-glow); }
+        .callout.tip svg { color: var(--green); }
+        .callout.warn { background: var(--yellow-subtle); border-color: rgba(217, 119, 6, 0.2); }
+        .callout.warn svg { color: var(--yellow); }
+
+        .inline-code {
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 0.82em;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .back-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: var(--radius);
+            background: var(--blue);
+            color: #fff;
+            font-family: var(--font);
+            font-size: var(--font-sm);
+            font-weight: 600;
+            text-decoration: none;
+            transition: all var(--transition);
+            margin-top: 8px;
+        }
+        .back-home:hover { background: var(--blue-hover); transform: translateY(-1px); }
+        .back-home:active { transform: translateY(0); }
+
+        .back-row { text-align: center; margin-top: 16px; }
+
+        /* ========== FOOTER ========== */
+        .app-footer {
+            text-align: center;
+            padding: 24px 20px;
+            padding-bottom: max(24px, var(--safe-bottom));
+            font-size: var(--font-xs);
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+        }
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px 18px;
+            align-items: center;
+        }
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: var(--font-xs);
+            transition: color var(--transition);
+        }
+        .footer-links a:hover { color: var(--blue); }
+        .footer-copyright { font-size: var(--font-xs); color: var(--text-muted); }
+        .footer-copyright a { color: var(--blue); text-decoration: none; font-weight: 500; }
+        .footer-copyright a:hover { text-decoration: underline; }
+
+        .coffee-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: var(--coffee-subtle);
+            border: 1px solid var(--coffee);
+            color: var(--coffee);
+            font-family: var(--font);
+            font-size: var(--font-xs);
+            font-weight: 600;
+            text-decoration: none;
+            transition: all var(--transition);
+            cursor: pointer;
+        }
+        .coffee-link:hover { background: var(--coffee); color: #fff; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(255, 129, 63, 0.25); }
+        .coffee-link:active { transform: translateY(0); }
+        .coffee-link svg { width: 15px; height: 15px; }
+
+        /* ========== SCROLLBAR ========== */
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 6px; border: 2px solid transparent; background-clip: content-box; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); background-clip: content-box; }
+        ::-webkit-scrollbar-corner { background: transparent; }
+        * { scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; }
+
+        @media (max-width: 480px) {
+            .topbar { padding: 10px 12px; padding-top: max(10px, var(--safe-top)); gap: 10px; }
+            .logo-img { width: 34px; height: 34px; }
+            .step-card { padding: 18px; }
+            .step-header { gap: 10px; }
+            .step-number { min-width: 32px; height: 32px; font-size: var(--font-xs); }
+        }
+    </style>
+</head>
+<body>
+    <!-- ========== TOPBAR ========== -->
+    <header class="topbar">
+        <a href="index.html" class="topbar-brand">
+            <img id="logoImage" class="logo-img" src="https://raw.githubusercontent.com/websolutionsza/PAWResizer/refs/heads/main/logo-512x512.png" alt="PAW Resizer" onerror="this.style.display='none'">
+            <div class="topbar-titles">
+                <h1 class="app-title">PAW<span class="accent-dot"></span>Resizer</h1>
+                <p class="app-subtitle">Precision Image Resizing</p>
+            </div>
+        </a>
+        <div class="topbar-actions">
+            <a href="index.html" class="btn-icon" aria-label="Back to resizer">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            </a>
+            <button class="btn-icon theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="icon icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                <svg class="icon icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- ========== HERO ========== -->
+    <section class="hero">
+        <span class="hero-eyebrow">
+            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            User Guide
+        </span>
+        <h1>How to use PAW Resizer</h1>
+        <p>A clear, step-by-step walkthrough covering image uploads, maskable safe-zones, padding and backgrounds, and exporting single files or full ZIP packages - all processed privately in your browser.</p>
+    </section>
+
+    <!-- ========== CONTENT ========== -->
+    <div class="content-wrap">
+        <nav class="step-nav">
+            <a href="#step-1"><span class="num">1</span> Upload</a>
+            <a href="#step-2"><span class="num">2</span> Safe-Zone</a>
+            <a href="#step-3"><span class="num">3</span> Padding</a>
+            <a href="#step-4"><span class="num">4</span> Export</a>
+        </nav>
+
+        <!-- STEP 1 -->
+        <article class="step-card" id="step-1">
+            <div class="step-header">
+                <span class="step-number">01</span>
+                <h2 class="step-title">Uploading Images</h2>
+            </div>
+            <p>PAW Resizer accepts PNG, JPEG, WEBP, and SVG files. Everything you upload stays on your device - the image is read into memory and drawn onto an HTML5 Canvas entirely in your browser. No file is ever transmitted to a server.</p>
+
+            <h3>Single file upload</h3>
+            <p>Click anywhere inside the dashed upload zone, or tap it on mobile. Your device's file picker will open. Select one image and it will load into the preview pane within a second. The original dimensions, file size, and filename are displayed beneath the preview so you always know what you are working with.</p>
+
+            <h3>Multi-file drag and drop</h3>
+            <p>You can drag multiple image files from your desktop directly onto the upload zone, or select several files in the file picker by holding Ctrl (Windows) or Cmd (macOS). When more than one file is loaded, a thumbnail strip appears below the upload zone. Each thumbnail is clickable to switch the active image, and a small remove button sits in the top-right corner of each thumbnail so you can quickly drop an unwanted file from the batch.</p>
+            <ul>
+                <li><strong>Click a thumbnail</strong> to make that image the active one for editing.</li>
+                <li><strong>Remove button</strong> (the small "x") deletes that image from the batch without affecting the others.</li>
+                <li><strong>Batch counter</strong> in the card header shows how many images are loaded.</li>
+            </ul>
+
+            <div class="callout tip">
+                <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <span>SVG files are rasterized cleanly at whatever dimension you choose. If your SVG has no intrinsic size, PAW Resizer reads its viewBox and uses that as the source dimensions, defaulting to 512x512 if neither is present.</span>
+            </div>
+
+            <h3>Cropping before resizing</h3>
+            <p>The crop button in the Preview card header opens a cropping overlay. Drag the blue selection box or its corner handles to frame the area you want to keep, then apply. The cropped result becomes the new active image and the original is replaced in the batch. This is useful when your source image has whitespace or borders you want to remove before generating icons.</p>
+        </article>
+
+        <!-- STEP 2 -->
+        <article class="step-card" id="step-2">
+            <div class="step-header">
+                <span class="step-number">02</span>
+                <h2 class="step-title">Using the Maskable Safe-Zone Toggle</h2>
+            </div>
+            <p>Android adaptive icons (also called "maskable" icons) can be cropped by the device launcher into shapes like circles, squircles, rounded squares, or teardrops. To survive every possible mask, your icon's important content must sit inside a central safe zone - a circle with a diameter equal to 80% of the icon's full size.</p>
+
+            <h3>Turning the safe-zone on</h3>
+            <p>In the Asset Presets card, flip the <strong>Show maskable safe-zone</strong> toggle. A dashed white circle appears over your preview, marking the boundary inside which all critical visual content must remain. Anything outside the circle may be clipped by an aggressive launcher mask, so keep logos, text, and key shapes within it.</p>
+
+            <h3>Pairing with the Android preset</h3>
+            <p>The <strong>Android</strong> quick preset automatically sets the dimensions to 512x512 and switches the safe-zone toggle on. This is the recommended starting point for generating maskable icons. Use the safe-zone circle as a guide while you adjust padding (see step 3) so your logo sits comfortably centered with breathing room on all sides.</p>
+
+            <div class="callout">
+                <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                <span>The safe-zone overlay is a preview guide only - it is never burned into the exported file. Your downloaded icon will not contain the dashed circle.</span>
+            </div>
+
+            <h3>When to use it</h3>
+            <ul>
+                <li><strong>Maskable / adaptive icons</strong> (Android): Always enable. Standard 192x192 and 512x512 maskable entries in your manifest should be designed with this zone in mind.</li>
+                <li><strong>Apple touch icons</strong> (iOS): Not required. iOS applies its own rounded-square mask, so you can fill the full canvas. The iOS preset turns the safe-zone off automatically.</li>
+                <li><strong>Favicons</strong>: Not required. Browsers display favicons at small sizes, so use the full frame and keep the design simple.</li>
+            </ul>
+        </article>
+
+        <!-- STEP 3 -->
+        <article class="step-card" id="step-3">
+            <div class="step-header">
+                <span class="step-number">03</span>
+                <h2 class="step-title">Adjusting Padding and Backgrounds</h2>
+            </div>
+            <p>The Canvas Background card lets you place your image on a colored or transparent backdrop with adjustable padding. This is essential for maskable icons, where you typically want your logo sitting on a solid background color with padding around it so the launcher mask never cuts into the artwork.</p>
+
+            <h3>Enabling the background</h3>
+            <p>Toggle <strong>Add background padding</strong> on. A set of options appears: background type, color or gradient stops, gradient angle, and a padding percentage slider. When enabled, your source image is scaled to fit within the inner area (canvas size minus padding on all sides) while preserving its aspect ratio, then centered on the background fill.</p>
+
+            <h3>Background types</h3>
+            <ul>
+                <li><strong>Solid</strong>: A single flat color. Pick the color with the swatch. Ideal for maskable icons that need a consistent brand background.</li>
+                <li><strong>Gradient</strong>: A two-stop linear gradient. Set the start and end colors, then adjust the angle from 0 to 360 degrees. Great for splash screens or decorative icons.</li>
+                <li><strong>Transparent</strong>: No fill is drawn - the canvas stays transparent. Use this for PNG favicons or icons that should let the underlying surface show through. JPEG does not support transparency, so switch to PNG when using this mode.</li>
+            </ul>
+
+            <h3>Padding percentage</h3>
+            <p>The padding slider runs from 0% to 50%. At 10% (the default for the Android preset), your image is inset by 10% of the canvas size on every side, leaving a frame of background around it. Higher values give more breathing room; lower values fill more of the canvas. For maskable icons, 10% padding combined with the safe-zone overlay typically keeps your logo well inside the protected area.</p>
+
+            <div class="callout tip">
+                <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <span>Turn on the safe-zone overlay while adjusting padding. If your logo fits entirely inside the dashed circle, it will survive every Android launcher mask shape.</span>
+            </div>
+
+            <h3>Edges and shape masks</h3>
+            <p>Separately, the Edges and Mask card lets you round the output itself with a shape mask - rounded rectangle, circle, squircle, teardrop, or rounded hexagon. You can also add a colored border stroke (inner or outer). These masks are applied to the final canvas, so they work together with background padding. Note that shape masks produce transparency in the corners, so PNG is the recommended output format when a mask is active.</p>
+        </article>
+
+        <!-- STEP 4 -->
+        <article class="step-card" id="step-4">
+            <div class="step-header">
+                <span class="step-number">04</span>
+                <h2 class="step-title">Exporting Single Files vs ZIP Packages</h2>
+            </div>
+            <p>PAW Resizer offers two export modes, controlled by the chips in the Batch and Package card: Single File and ZIP Package. Each serves a different stage of your workflow.</p>
+
+            <h3>Single File export</h3>
+            <p>Choose <strong>Single File</strong> to export the current image at exactly the dimensions shown in the Resize Dimensions card, using the selected output format (PNG or JPEG). Click <strong>Resize and Download</strong> and the file downloads immediately with a name like <span class="inline-code">logo-192x192.png</span>. This is the fastest path when you need one specific size - for example, generating a 180x180 apple-touch-icon or a 32x32 favicon.</p>
+            <ul>
+                <li><strong>PNG</strong>: Lossless, supports transparency. Best for icons, favicons, and maskable assets.</li>
+                <li><strong>JPEG</strong>: Lossy with an adjustable quality slider (10-100%). Best for splash screens and photographic content where file size matters more than sharp edges.</li>
+            </ul>
+            <p>After a single-file export, a green result card appears in the preview pane showing the output dimensions, format, and file size, plus a <strong>Download Again</strong> button in case you need another copy.</p>
+
+            <h3>ZIP Package export</h3>
+            <p>Switch to <strong>ZIP Package</strong> to generate a complete PWA icon set in one downloadable archive. The action button changes to <strong>Download ZIP Package</strong>, and a checklist of bundle contents appears. Tick or untick the categories you need:</p>
+            <ul>
+                <li><strong>Android icons</strong>: 192x192 and 512x512 maskable PNGs with 10% padding applied, placed in the <span class="inline-code">android/</span> folder.</li>
+                <li><strong>iOS icons</strong>: 180x180 apple-touch-icon plus 120, 152, and 167 variants, and seven common splash-screen ratios, in the <span class="inline-code">ios/</span> and <span class="inline-code">ios/splash/</span> folders.</li>
+                <li><strong>Favicon</strong>: A multi-size <span class="inline-code">favicon.ico</span> (16, 32, 48) plus individual PNGs, in the <span class="inline-code">favicons/</span> folder.</li>
+                <li><strong>manifest.json</strong>: A ready-to-use web app manifest referencing all generated icons.</li>
+            </ul>
+            <p>The archive also includes standard PWA sizes (16 through 512) in the <span class="inline-code">icons/</span> folder, Microsoft tile graphics in <span class="inline-code">microsoft-tiles/</span>, and a <span class="inline-code">browserconfig.xml</span> for Windows tiles. Drop the unzipped folders into your project root and link the manifest from your HTML.</p>
+
+            <div class="callout warn">
+                <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <span>ZIP generation processes many sizes in sequence, so it can take a few seconds on large source images. Keep the tab focused during generation - some browsers throttle background work.</span>
+            </div>
+
+            <h3>HTML Metadata Snippet</h3>
+            <p>Once you have your files, scroll to the HTML Metadata Snippet card on the main page. It auto-generates a ready-to-paste block of manifest and apple-touch-icon link tags based on your current dimensions and settings. Click <strong>Copy</strong> and drop it into the <span class="inline-code">&lt;head&gt;</span> of your HTML document.</p>
+
+            <div class="back-row">
+                <a href="index.html" class="back-home">
+                    <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                    Back to Resizer
+                </a>
+            </div>
+        </article>
+    </div>
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="app-footer">
+        <a href="https://www.buymeacoffee.com/" target="_blank" rel="noopener noreferrer" class="coffee-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+            Buy me a coffee
+        </a>
+        <div class="footer-links">
+            <a href="index.html">Resizer</a>
+            <a href="privacy-policy.html">Privacy Policy</a>
+            <a href="https://websolutionssa.pages.dev/" target="_blank" rel="noopener noreferrer">Website</a>
+        </div>
+        <div class="footer-copyright">
+            &copy; 2026 PAW Resizer. All rights reserved. | Created and developed by <a href="https://websolutionssa.pages.dev/" target="_blank" rel="noopener noreferrer">websolutionssa</a>
+        </div>
+    </footer>
+
+    <script>
+        (function() {
+            const themeToggle = document.getElementById('themeToggle');
+            const savedTheme = localStorage.getItem('paw-theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            const meta = document.querySelector('meta[name="theme-color"]');
+            if (meta) meta.setAttribute('content', savedTheme === 'dark' ? '#0a0a0a' : '#ffffff');
+
+            themeToggle.addEventListener('click', function() {
+                const current = document.documentElement.getAttribute('data-theme');
+                const next = current === 'light' ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', next);
+                localStorage.setItem('paw-theme', next);
+                if (meta) meta.setAttribute('content', next === 'dark' ? '#0a0a0a' : '#ffffff');
+            });
+        })();
+    </script>
+</body>
+</html>
